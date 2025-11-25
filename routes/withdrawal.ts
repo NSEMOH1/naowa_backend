@@ -53,7 +53,7 @@ router.post(
 );
 
 router.get(
-  "/",
+  "/member",
   requireRoles([Role.MEMBER]),
   async (
     req: AuthenticatedRequest,
@@ -84,7 +84,7 @@ router.get(
 );
 
 router.get(
-  "/:id",
+  "/member/:id",
   requireRoles([Role.MEMBER]),
   async (
     req: AuthenticatedRequest,
@@ -304,7 +304,7 @@ router.get(
     next: NextFunction
   ): Promise<void> => {
     try {
-      const status = req.query.status as WithdrawalStatus | undefined;
+      const status = req.query.status as WithdrawalStatus;
 
       const withdrawals = await prisma.withdrawal.findMany({
         where: status ? { status } : {},
