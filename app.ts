@@ -18,6 +18,7 @@ import { balanceRoutes } from "./routes/balances";
 import { paymentRoutes } from "./routes/payment";
 import { transactionRoutes } from "./routes/transactions";
 import { withdrawalRoutes } from "./routes/withdrawal";
+import { notificationRoutes } from "./routes/notifications";
 
 const createApp = () => {
   const app = express();
@@ -63,9 +64,9 @@ const createApp = () => {
   app.use("/api/balances", balanceRoutes);
   app.use("/api/payments", paymentRoutes);
   app.use("/api/withdrawal", withdrawalRoutes);
+  app.use("/api/notifications", notificationRoutes);
   app.use("/api/transactions", transactionRoutes);
 
-  //   setupSocket(io);
   app.use(/.*/, (req, res) => {
     res.status(404).json({ error: "Route not found" });
   });
