@@ -42,10 +42,6 @@ export const applyForLoan = async (applicationData: LoanApplicationData) => {
       throw new Error("Member not found");
     }
 
-    // if (member.status !== "ACTIVE") {
-    //   throw new Error("Member account is not active");
-    // }
-
     const loanCategory = await tx.loanCategory.findFirst({
       where: {
         name: category,
@@ -73,6 +69,7 @@ export const applyForLoan = async (applicationData: LoanApplicationData) => {
             LoanStatus.PENDING,
             LoanStatus.PENDING_VERIFICATION,
             LoanStatus.ACTIVE,
+            LoanStatus.APPROVED,
           ],
         },
       },
@@ -179,7 +176,6 @@ export const applyForLoan = async (applicationData: LoanApplicationData) => {
   });
 };
 
-// TODO: Send OTP via SMS OR MAIL
 
 export const calculateRepayments = (
   loanId: string,

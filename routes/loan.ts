@@ -3,6 +3,7 @@ import {
   applyForLoan,
   approveLoan,
   confirmLoanWithOTP,
+  disburseLoan,
   fetchActiveLoans,
   // getActiveLoanCategory,
   getAdminLoanStatistics,
@@ -263,6 +264,62 @@ router.post(
       res.json({
         success: true,
         message: "Loan rejected successfully",
+        data: result.loan,
+        transaction: result.transaction,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.post(
+  "/:id/disburse",
+  requireRoles([Role.ADMIN]),
+  async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const { id: loanId } = req.params;
+      const adminId = req.user?.id;
+
+      if (!adminId) {
+        res.status(401).json({
+          success: false,
+          message: "Admin not authenticated",
+        });
+        return;
+      }
+
+      const result = await disburseLoan(
+        {
+          loanId,
+        },
+        adminId
+      );
+
+      //   await notifyLoanStatus(
+      //     result.loan.memberId,
+      //     loanId,
+      //     "REJECTED",
+      //     adminId,
+      //     result.loan.amount,
+      //     result.loan.categoryId
+      //   );
+
+      if (!result.success) {
+        res.status(400).json({
+          success: false,
+          message: result.error,
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        message: "Loan disbursed successfully",
         data: result.loan,
         transaction: result.transaction,
       });

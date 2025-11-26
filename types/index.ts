@@ -225,7 +225,8 @@ export interface MemberLoanHistory {
 }
 
 export interface CooperativeSavingsRecord {
-  serviceNumber: string;
+  email: string;
+  username: string
   amount: number;
   memberName?: string;
 }
@@ -242,7 +243,7 @@ export interface UploadResult {
   errorCount: number;
   errors: Array<{
     row: number;
-    serviceNumber?: string;
+    username?: string
     error: string;
   }>;
   summary: {

@@ -326,7 +326,6 @@ export const getAllSavings = async () => {
     total: total._sum.amount || 0,
   };
 };
-
 export const uploadCooperativeSavingsFromExcel = async (
   fileBuffer: Buffer,
   uploadedBy?: string
@@ -373,20 +372,17 @@ export const uploadCooperativeSavingsFromExcel = async (
       throw new Error("Could not read first row of data");
     }
 
-    const hasServiceNumber =
-      firstRow["Service Number"] ||
-      firstRow["service_number"] ||
-      firstRow["ServiceNumber"];
+    const hasEmail = firstRow["Email"] || firstRow["email"];
+    const hasUsername = firstRow["Username"] || firstRow["username"];
     const hasAmount =
       firstRow["Amount"] || firstRow["amount"] || firstRow["Deduction"];
 
-    if (!hasServiceNumber || !hasAmount) {
+    if (!hasEmail || !hasUsername || !hasAmount) {
       throw new Error(
-        "Excel file is missing required columns (Service Number and Amount)"
+        "Excel file is missing required columns (Email, Username, and Amount)"
       );
     }
 
-    // Get cooperative savings category
     const cooperativeCategory = await prisma.savingCategory.findUnique({
       where: { type: SavingType.COOPERATIVE },
     });
@@ -395,31 +391,25 @@ export const uploadCooperativeSavingsFromExcel = async (
       throw new Error("Cooperative savings category not found");
     }
 
-    // Process records in transaction
     await prisma.$transaction(async (tx) => {
       const validRecords: CooperativeSavingsRecord[] = [];
 
-      // Validate and parse data
       for (let i = 0; i < jsonData.length; i++) {
         const row = jsonData[i];
-        const rowNumber = i + 2; // Excel row number (assuming row 1 is header)
+        const rowNumber = i + 2;
 
         try {
-          // Extract data (adjust column names based on your Excel structure)
-          const serviceNumber =
-            row["Service Number"] ||
-            row["service_number"] ||
-            row["ServiceNumber"];
+          const email = row["Email"] || row["email"];
+          const username = row["Username"] || row["username"];
           const amount = parseFloat(
             row["Amount"] || row["amount"] || row["Deduction"]
           );
           const memberName = row["Name"] || row["name"] || row["Member Name"];
 
-          // Validate required fields
-          if (!serviceNumber) {
+          if (!email || !username) {
             result.errors.push({
               row: rowNumber,
-              error: "Service number is required",
+              error: "Email and Username are required",
             });
             continue;
           }
@@ -427,14 +417,15 @@ export const uploadCooperativeSavingsFromExcel = async (
           if (!amount || amount <= 0) {
             result.errors.push({
               row: rowNumber,
-              serviceNumber: serviceNumber.toString(),
+              username: username.toString(),
               error: "Valid amount is required",
             });
             continue;
           }
 
           validRecords.push({
-            serviceNumber: serviceNumber.toString().trim(),
+            email: email.toString().trim(),
+            username: username.toString().trim(),
             amount,
             memberName: memberName?.toString().trim(),
           });
@@ -451,12 +442,12 @@ export const uploadCooperativeSavingsFromExcel = async (
       result.summary.validRecords = validRecords.length;
       result.summary.invalidRecords = result.errors.length;
 
-      // Process valid records
       for (const record of validRecords) {
         try {
-          // Find member by service number
           const member = await tx.member.findFirst({
-            where: { username: record.serviceNumber },
+            where: {
+              OR: [{ email: record.email }, { username: record.username }],
+            },
             select: {
               id: true,
               full_name: true,
@@ -465,18 +456,16 @@ export const uploadCooperativeSavingsFromExcel = async (
 
           if (!member) {
             result.errors.push({
-              row: 0, // We don't have row number at this point
-              serviceNumber: record.serviceNumber,
-              error: "Member with this service number not found",
+              row: 0,
+              username: record.username,
+              error: "Member with this email or username not found",
             });
             result.errorCount++;
             continue;
           }
 
-          // Validate member name if provided in Excel
           if (record.memberName) {
-            const fullName =
-              `${member.full_name}`.toLowerCase();
+            const fullName = `${member.full_name}`.toLowerCase();
             const providedName = record.memberName.toLowerCase();
 
             if (
@@ -485,7 +474,7 @@ export const uploadCooperativeSavingsFromExcel = async (
             ) {
               result.errors.push({
                 row: 0,
-                serviceNumber: record.serviceNumber,
+                username: record.username,
                 error: `Name mismatch: Expected '${fullName}', found '${record.memberName}'`,
               });
               result.errorCount++;
@@ -496,7 +485,6 @@ export const uploadCooperativeSavingsFromExcel = async (
           const amount = new Decimal(record.amount);
           const reference = generateSavingsReference();
 
-          // Create cooperative savings record
           const saving = await tx.saving.create({
             data: {
               memberId: member.id,
@@ -507,14 +495,13 @@ export const uploadCooperativeSavingsFromExcel = async (
             },
           });
 
-          // Create transaction record
           await tx.transaction.create({
             data: {
               memberId: member.id,
               amount: amount.toNumber(),
               type: TransactionType.SAVINGS_DEPOSIT,
               reference: reference,
-              description: `Cooperative savings deduction from external bank account (Service No: ${record.serviceNumber})`,
+              description: `Cooperative savings deduction from external bank account (Username: ${record.username})`,
               status: "COMPLETED",
             },
           });
@@ -524,7 +511,7 @@ export const uploadCooperativeSavingsFromExcel = async (
         } catch (error) {
           result.errors.push({
             row: 0,
-            serviceNumber: record.serviceNumber,
+            username: record.username,
             error: `Error processing record: ${
               error instanceof Error ? error.message : "Unknown error"
             }`,

@@ -391,6 +391,7 @@ export const getAllMembers = async (
       role: true,
       created_at: true,
       updated_at: true,
+      address: true,
       bank: {
         select: {
           account_number: true,

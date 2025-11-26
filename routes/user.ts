@@ -158,22 +158,22 @@ router.get(
   }
 );
 
-// router.get(
-//   "/members/:id/loans",
-//   requireRoles([Role.MEMBER, Role.ADMIN]),
-//   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-//     try {
-//       const loans = await prisma.loan.findMany({
-//         where: { memberId: req.params.id },
-//         orderBy: { createdAt: "desc" },
-//         include: { repayments: true },
-//       });
-//       res.json(loans);
-//     } catch (error) {
-//       res.status(500).json({ message: "Error fetching loan history" });
-//     }
-//   }
-// );
+router.get(
+  "/members/:id/loans",
+  requireRoles([Role.MEMBER, Role.ADMIN]),
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const loans = await prisma.loan.findMany({
+        where: { memberId: req.params.id },
+        orderBy: { createdAt: "desc" },
+        include: { repayments: true },
+      });
+      res.json(loans);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching loan history" });
+    }
+  }
+);
 
 router.put(
   "/users/:id",
