@@ -33,9 +33,7 @@ export const generateFinancialReport = async (
         ? {
             select: {
               id: true,
-              first_name: true,
-              last_name: true,
-              service_number: true,
+              full_name: true,
             },
           }
         : false,
@@ -82,8 +80,7 @@ export const generateFinancialReport = async (
           status: t.status,
           member: {
             id: t.member!.id,
-            name: `${t.member!.first_name} ${t.member!.last_name}`,
-            serviceNumber: t.member!.service_number,
+            name: `${t.member!.full_name}`,
           },
         }))
     : undefined;
@@ -93,13 +90,12 @@ export const generateFinancialReport = async (
         .filter((t) => t.member)
         .reduce((acc, t) => {
           const memberId = t.member!.id;
-          const memberName = `${t.member!.first_name} ${t.member!.last_name}`;
+          const memberName = `${t.member!.full_name}`;
 
           if (!acc[memberId]) {
             acc[memberId] = {
               id: memberId,
               name: memberName,
-              serviceNumber: t.member!.service_number,
               totalTransactions: 0,
               totalAmount: 0,
               transactionTypes: {},
@@ -165,9 +161,7 @@ export const generateLoanRepaymentReport = async (
           member: {
             select: {
               id: true,
-              first_name: true,
-              last_name: true,
-              service_number: true,
+              full_name: true,
               email: true,
               phone: true,
             },
@@ -215,8 +209,7 @@ export const generateLoanRepaymentReport = async (
         },
         member: {
           id: r.loan.member.id,
-          name: `${r.loan.member.first_name} ${r.loan.member.last_name}`,
-          serviceNumber: r.loan.member.service_number,
+          name: `${r.loan.member.full_name}`,
           email: r.loan.member.email,
           phone: r.loan.member.phone,
         },
@@ -356,8 +349,7 @@ export const generateMemberFinancialSummary = async (
   const report = {
     member: {
       id: member.id,
-      name: `${member.first_name} ${member.last_name}`,
-      serviceNumber: member.service_number,
+      name: `${member.full_name}`,
       email: member.email,
       phone: member.phone,
       totalSavings: totalSavings,
@@ -398,9 +390,7 @@ export const getAllMembersFinancialSummary = async (
   const members = await prisma.member.findMany({
     select: {
       id: true,
-      first_name: true,
-      last_name: true,
-      service_number: true,
+      full_name: true,
       email: true,
       phone: true,
       monthlyDeduction: true,
@@ -450,8 +440,7 @@ export const getAllMembersFinancialSummary = async (
 
     return {
       id: member.id,
-      name: `${member.first_name} ${member.last_name}`,
-      serviceNumber: member.service_number,
+      name: `${member.full_name}`,
       email: member.email,
       phone: member.phone,
       totalSavings: totalSavings,
