@@ -1,4 +1,3 @@
-import { Role, MemberStatus } from "../generated/prisma";
 import { prisma } from "../config/database";
 import {
   CreateMemberData,
@@ -10,7 +9,7 @@ import {
   UpdateUserData,
 } from "../types";
 import { hashAnswer, hashPassword, hashPin } from "../utils/password";
-import { Prisma, UserStatus } from "@prisma/client";
+import { MemberStatus, Prisma, Role, UserStatus } from "@prisma/client";
 
 export const createMember = async (userData: CreateMemberData) => {
   const hashedPin = await hashPin(userData.pin);

@@ -47,8 +47,8 @@ async function seedDatabase() {
   }
 
   async function main() {
-    // await seedLoanType();
-    // await seedSavingsType();
+    await seedLoanType();
+    await seedSavingsType();
     console.log("Seeding completed for selected tables");
   }
 
