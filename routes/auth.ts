@@ -16,9 +16,9 @@ import {
   verifyResetOtp,
 } from "../services/authService";
 import { requireRoles } from "../middleware/requireRoles";
-import { Role } from "../generated/prisma";
 import path from "path";
 import { handleFileUpload, multerErrorHandler } from "../middleware/fileUpload";
+import { Role } from "@prisma/client";
 
 const router = Router();
 
