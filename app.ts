@@ -4,6 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import { Server as SocketIOServer } from "socket.io";
+import { Request, Response } from "express";
 import { createServer } from "http";
 import { errorHandler } from "./middleware/errorHandler";
 import { config } from "./config/env";
@@ -23,33 +24,43 @@ import { notificationRoutes } from "./routes/notifications";
 const createApp = () => {
   const app = express();
   const httpServer = createServer(app);
+
+  app.use(
+    cors({
+      origin: config.allowedOrigins,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      credentials: true,
+    })
+  );
+
   const io = new SocketIOServer(httpServer, {
     cors: {
       origin: config.allowedOrigins,
-      methods: ["GET", "POST", 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
       credentials: true,
     },
   });
 
-  app.use(helmet());
-  app.use(
-    cors({
-      origin: config.allowedOrigins,
-      methods: ["GET", "POST", 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
-      credentials: true,
-    })
-  );
-  // const limiter = rateLimit({
-  //   windowMs: 15 * 60 * 1000,
-  //   max: 100,
-  // });
-  // app.use(limiter);
+  app.options(/.*/, (req: Request, res: Response) => {
+    const origin = req.headers.origin;
+    if (origin && config.allowedOrigins.includes(origin)) {
+      res.header("Access-Control-Allow-Origin", origin);
+    }
 
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+
+    return res.sendStatus(200);
+  });
+
+  app.use(helmet());
   if (config.nodeEnv !== "test") {
     app.use(morgan("combined"));
   }
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
