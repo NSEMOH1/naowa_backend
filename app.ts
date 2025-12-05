@@ -26,7 +26,8 @@ const createApp = () => {
   const io = new SocketIOServer(httpServer, {
     cors: {
       origin: config.allowedOrigins,
-      methods: ["GET", "POST"],
+      methods: ["GET", "POST", 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true,
     },
   });

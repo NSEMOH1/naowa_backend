@@ -220,7 +220,7 @@ export const deleteMember = async (id: string) => {
     throw new Error("Member not found");
   }
 
-  return prisma.user.delete({
+  return prisma.member.delete({
     where: { id },
     select: {
       id: true,
