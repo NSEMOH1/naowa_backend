@@ -11,10 +11,9 @@ import {
   updateMember,
   updateUser,
 } from "../services/userService";
-import {
-  AuthenticatedRequest,
-  UpdateUserData,
-} from "../types";
+import { AuthenticatedRequest, UpdateUserData } from "../types";
+import path from "path";
+import fs from "fs";
 import { requireRoles } from "../middleware/requireRoles";
 import { MemberStatus, Role, UserStatus } from "../generated/prisma";
 // import { validateBody } from "../middleware/validateBody";
@@ -289,7 +288,6 @@ router.get(
   }
 );
 
-
 router.post(
   "/member/change-pin",
   requireRoles([Role.MEMBER]),
@@ -360,6 +358,91 @@ router.get(
         success: true,
         ...result,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.get(
+  "/file/download/:filename",
+  requireRoles([Role.MEMBER, Role.ADMIN]),
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { filename } = req.params;
+
+      if (!filename) {
+        res.status(400).json({ message: "Filename is required" });
+        return;
+      }
+
+      const uploadDir = path.join(__dirname, "../uploads");
+      const filePath = path.join(uploadDir, filename);
+
+      const normalizedPath = path.normalize(filePath);
+      if (!normalizedPath.startsWith(uploadDir)) {
+        res.status(403).json({ message: "Access denied" });
+        return;
+      }
+
+      if (!fs.existsSync(filePath)) {
+        res.status(404).json({ message: "File not found" });
+        return;
+      }
+      res.download(filePath, filename, (err) => {
+        if (err) {
+          console.error("File download error:", err);
+          if (!res.headersSent) {
+            res.status(500).json({ message: "Error downloading file" });
+          }
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.get(
+  "/file/view/:filename",
+  requireRoles([Role.MEMBER, Role.ADMIN]),
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { filename } = req.params;
+
+      if (!filename) {
+        res.status(400).json({ message: "Filename is required" });
+        return;
+      }
+
+      const uploadDir = path.join(__dirname, "../uploads");
+      const filePath = path.join(uploadDir, filename);
+      const normalizedPath = path.normalize(filePath);
+
+      if (!normalizedPath.startsWith(uploadDir)) {
+        res.status(403).json({ message: "Access denied" });
+        return;
+      }
+
+      if (!fs.existsSync(filePath)) {
+        res.status(404).json({ message: "File not found" });
+        return;
+      }
+
+      const ext = path.extname(filename).toLowerCase();
+      const contentTypes: { [key: string]: string } = {
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".gif": "image/gif",
+        ".webp": "image/webp",
+        ".svg": "image/svg+xml",
+        ".pdf": "application/pdf",
+      };
+
+      const contentType = contentTypes[ext] || "application/octet-stream";
+      res.setHeader("Content-Type", contentType);
+      res.sendFile(filePath);
     } catch (error) {
       next(error);
     }

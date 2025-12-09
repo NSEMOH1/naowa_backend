@@ -14,7 +14,7 @@ import { MemberStatus, Prisma, Role, UserStatus } from "@prisma/client";
 export const createMember = async (userData: CreateMemberData) => {
   const hashedPin = await hashPin(userData.pin);
   const hashedAnswer = await hashAnswer(userData.security_answer);
-  const hashedPassword = await hashPassword(userData.password)
+  const hashedPassword = await hashPassword(userData.password);
 
   return await prisma.$transaction(async (prisma) => {
     try {
@@ -23,7 +23,7 @@ export const createMember = async (userData: CreateMemberData) => {
         full_name: userData.full_name,
         password: hashedPassword,
         profile_picture: userData.profile_picture,
-        nin_document:userData.nin_document,
+        nin_document: userData.nin_document,
         gender: userData.gender,
         phone: userData.phone,
         username: userData.username,
@@ -167,6 +167,7 @@ export const updateMember = async (
     where: { id },
     include: {
       next_of_kin: true,
+      bank: true,
     },
   });
 
@@ -187,6 +188,15 @@ export const updateMember = async (
             },
           },
         }),
+      ...(userData.bank &&
+        existingUser.bank.length > 0 && {
+          bank: {
+            update: {
+              where: { id: existingUser.bank[0].id },
+              data: userData.bank as Prisma.BankUpdateInput,
+            },
+          },
+        }),
     },
     select: {
       id: true,
@@ -203,6 +213,13 @@ export const updateMember = async (
           phone: true,
           email: true,
           address: true,
+        },
+      },
+      bank: {
+        select: {
+          bank_name: true,
+          account_name: true,
+          account_number: true,
         },
       },
     },
@@ -296,7 +313,8 @@ export const findMemberById = async (id: string) => {
       status: true,
       monthlyDeduction: true,
       marital_status: true,
-      place_of_work: true
+      place_of_work: true,
+      profile_picture: true,
     },
   });
 
