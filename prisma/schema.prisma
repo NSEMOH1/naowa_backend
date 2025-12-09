@@ -119,6 +119,7 @@ enum Role {
   MEMBER
   STAFF
   ADMIN
+  SUPER_ADMIN
 }
 
 enum Title {
