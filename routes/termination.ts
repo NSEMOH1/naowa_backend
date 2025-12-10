@@ -41,7 +41,7 @@ router.post(
 
 router.get(
     "/",
-    requireRoles([Role.ADMIN]),
+    requireRoles([Role.STAFF, Role.ADMIN]),
     async (
         req: AuthenticatedRequest,
         res: Response,

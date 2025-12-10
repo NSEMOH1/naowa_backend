@@ -265,6 +265,26 @@ export const deactivateMember = async (id: string) => {
   });
 };
 
+export const activateMember = async (id: string) => {
+  const member = await prisma.member.findUnique({
+    where: { id },
+  });
+
+  if (!member) {
+    throw new Error("Member not found");
+  }
+
+  return prisma.member.update({
+    where: { id },
+    data: {
+      status: MemberStatus.ACTIVE,
+    },
+    select: {
+      id: true,
+    },
+  });
+};
+
 export const findMemberByUsername = async (username: string) => {
   if (!username) {
     throw new Error("Username is required");

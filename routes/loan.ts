@@ -88,7 +88,7 @@ router.post(
 
 router.get(
   "/",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const result = await getAllLoans();
@@ -104,7 +104,7 @@ router.get(
 
 router.get(
   "/admin-stats",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const adminStats = await getAdminLoanStatistics();
@@ -151,7 +151,7 @@ router.post(
 
 router.post(
   "/:id/approve",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -209,7 +209,7 @@ router.post(
 
 router.post(
   "/:id/reject",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -275,7 +275,7 @@ router.post(
 
 router.post(
   "/:id/disburse",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,

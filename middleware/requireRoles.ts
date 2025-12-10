@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import { verifyToken } from "../utils/jwt";
 import { AuthenticatedRequest } from "../types";
-import { Role } from "../generated/prisma";
+import { Role } from "@prisma/client";
 
 export const requireRoles = (allowedRoles: Role[]) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {

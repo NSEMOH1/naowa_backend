@@ -38,7 +38,7 @@ router.get(
   }
 );
 
-router.get("/user/:userId", requireRoles([Role.ADMIN]), async (req, res) => {
+router.get("/user/:userId", requireRoles([Role.STAFF, Role.ADMIN]), async (req, res) => {
   try {
     const { userId } = req.params;
     const { page = 1, limit = 20 } = req.query;
@@ -65,7 +65,7 @@ router.get("/user/:userId", requireRoles([Role.ADMIN]), async (req, res) => {
 
 router.put(
   "/:id/read",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req, res) => {
     try {
       const { id } = req.params;
@@ -83,7 +83,7 @@ router.put(
 
 router.get(
   "/member/:memberId/unread-count",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req, res) => {
     try {
       const { memberId } = req.params;
@@ -103,7 +103,7 @@ router.get(
 
 router.get(
   "/user/:userId/unread-count",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req, res) => {
     try {
       const { userId } = req.params;
@@ -123,7 +123,7 @@ router.get(
 
 router.post(
   "/loan-application",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req, res) => {
     try {
       const { memberId, loanId, amount, categoryName } = req.body;
@@ -148,7 +148,7 @@ router.post(
 
 router.post(
   "/loan-status",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req, res) => {
     try {
       const { memberId, loanId, status, userId, amount, categoryName } =
@@ -173,7 +173,7 @@ router.post(
 
 router.post(
   "/savings-deposit",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req, res) => {
     try {
       const { memberId, savingId, amount, categoryName } = req.body;
@@ -198,7 +198,7 @@ router.post(
 
 router.post(
   "/member-registration",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req, res) => {
     try {
       const { memberId } = req.body;
@@ -218,7 +218,7 @@ router.post(
 
 router.post(
   "/member-approval",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req, res) => {
     try {
       const { memberId, status, userId } = req.body;
@@ -235,7 +235,7 @@ router.post(
 
 router.post(
   "/transaction",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req, res) => {
     try {
       const { memberId, transactionId, amount, type, description } = req.body;
@@ -258,7 +258,7 @@ router.post(
 
 router.post(
   "/broadcast-members",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req, res) => {
     try {
       const { title, message, type = "INFO" } = req.body;
@@ -282,7 +282,7 @@ router.post(
 
 router.post(
   "/broadcast-users",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req, res) => {
     try {
       const { title, message, type = "INFO" } = req.body;

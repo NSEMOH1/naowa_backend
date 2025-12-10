@@ -9,7 +9,7 @@ const router = Router();
 
 router.get(
   "/financial",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -69,7 +69,7 @@ router.get(
 
 router.get(
   "/monthly-deductions",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -106,7 +106,7 @@ router.get(
 
 router.get(
   "/loan-repayments",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -140,7 +140,7 @@ router.get(
 
 router.get(
   "/dividends",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -176,7 +176,7 @@ router.get(
 
 router.get(
   "/interests",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
