@@ -17,11 +17,10 @@ import { AuthenticatedRequest, UpdateUserData } from "../types";
 import path from "path";
 import fs from "fs";
 import { requireRoles } from "../middleware/requireRoles";
-import { Role, MemberStatus, UserStatus } from "@prisma/client";
 // import { validateBody } from "../middleware/validateBody";
 // import { pinSchema } from "../utils/validators/auth";
 import { prisma } from "../config/database";
-import { Prisma } from "@prisma/client";
+import { MemberStatus, Prisma, Role, UserStatus } from "@prisma/client";
 
 const router = Router();
 
