@@ -7,8 +7,7 @@ import {
 import { generateToken } from "../utils/jwt";
 import { prisma } from "../config/database";
 import { LoginData, UserLoginData } from "../types";
-import { MemberStatus } from "../generated/prisma";
-import { Role, UserStatus } from "@prisma/client";
+import { Role, UserStatus, MemberStatus } from "@prisma/client";
 import { sendOTPEmail } from "../utils/emailTransporter";
 import { generateOTP } from "../utils/functions";
 
@@ -22,11 +21,11 @@ export const authenticateMember = async (loginData: LoginData) => {
       "Account not activated. Please contact administrator for password setup."
     );
   }
-  // if (member.status === "INACTIVE") {
-  //   throw new Error(
-  //     "Your account has is not active. Please contact the administrator."
-  //   );
-  // }
+  if (member.status === MemberStatus.INACTIVE) {
+    throw new Error(
+      "Your account is not active. Please contact the administrator."
+    );
+  }
   const isPasswordValid = await comparePasswords(
     loginData.password,
     member.password

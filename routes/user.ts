@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import {
   approveMember,
   changePin,
+  deactivateMember,
   deleteMember,
   deleteUser,
   findMemberById,
@@ -38,6 +39,29 @@ router.delete(
       const deletedUser = await deleteMember(id);
       res.status(200).json({
         message: "User deleted successfully",
+        id: deletedUser.id,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.put(
+  "/member/:id/deactivate",
+  requireRoles([Role.ADMIN]),
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({ message: "Member ID is required" });
+        return;
+      }
+
+      const deletedUser = await deactivateMember(id);
+      res.status(200).json({
+        message: "User deactivated successfully",
         id: deletedUser.id,
       });
     } catch (error) {
