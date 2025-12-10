@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import {
+  activateMember,
   approveMember,
   changePin,
   deactivateMember,
@@ -25,7 +26,7 @@ const router = Router();
 
 router.delete(
   "/member/:id",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
@@ -48,7 +49,7 @@ router.delete(
 
 router.put(
   "/member/:id/deactivate",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
@@ -70,8 +71,31 @@ router.put(
 );
 
 router.put(
+  "/member/:id/activate",
+  requireRoles([Role.STAFF, Role.ADMIN]),
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({ message: "Member ID is required" });
+        return;
+      }
+
+      const deletedUser = await activateMember(id);
+      res.status(200).json({
+        message: "User activated successfully",
+        id: deletedUser.id,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.put(
   "/member/:id",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
@@ -102,7 +126,7 @@ router.put(
 
 router.get(
   "/members",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -149,7 +173,7 @@ router.get(
 
 router.get(
   "/members/:id",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
@@ -166,7 +190,7 @@ router.get(
 
 router.get(
   "/members/:id/savings",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const savings = await prisma.saving.findMany({
@@ -182,7 +206,7 @@ router.get(
 
 router.get(
   "/members/:id/loans",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const loans = await prisma.loan.findMany({
@@ -199,7 +223,7 @@ router.get(
 
 router.put(
   "/users/:id",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -232,7 +256,7 @@ router.put(
 
 router.delete(
   "/users/:id",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
@@ -255,7 +279,7 @@ router.delete(
 
 router.get(
   "/members/:memberId/approve",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -290,7 +314,7 @@ router.get(
 
 router.get(
   "/members/:memberId/reject",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { memberId } = req.params;
@@ -342,7 +366,7 @@ router.post(
 
 router.get(
   "/users",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -389,7 +413,7 @@ router.get(
 
 router.get(
   "/file/download/:filename",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { filename } = req.params;
@@ -428,7 +452,7 @@ router.get(
 
 router.get(
   "/file/view/:filename",
-  requireRoles([Role.MEMBER, Role.ADMIN]),
+  requireRoles([Role.MEMBER, Role.STAFF, Role.ADMIN]),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { filename } = req.params;

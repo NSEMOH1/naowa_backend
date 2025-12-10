@@ -43,7 +43,7 @@ router.post(
 
 router.post(
   "/:id/approve",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -69,7 +69,7 @@ router.post(
 
 router.post(
   "/:id/reject",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -95,7 +95,7 @@ router.post(
 
 router.get(
   "/",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,

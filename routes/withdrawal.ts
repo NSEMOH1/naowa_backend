@@ -155,7 +155,7 @@ router.patch(
 
 router.get(
   "/pending",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -176,7 +176,7 @@ router.get(
 
 router.patch(
   "/:id/approve",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -220,7 +220,7 @@ router.patch(
 
 router.patch(
   "/admin/withdrawals/:id/reject",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -274,7 +274,7 @@ router.patch(
 
 router.get(
   "/admin/withdrawals/reference/:reference",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -297,7 +297,7 @@ router.get(
 
 router.get(
   "/admin",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,

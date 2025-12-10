@@ -104,7 +104,7 @@ router.post(
 
 router.post(
   "/auth/change-password",
-  requireRoles([Role.ADMIN, Role.MEMBER]),
+  requireRoles([Role.ADMIN, Role.STAFF, Role.MEMBER]),
   async (
     req: AuthenticatedRequest,
     res: Response,

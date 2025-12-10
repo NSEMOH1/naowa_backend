@@ -190,7 +190,7 @@ router.put(
 
 router.get(
   "/",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -240,7 +240,7 @@ router.get(
 
 router.post(
   "/upload/cooperative-savings",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   upload.single("file"),
   async (
     req: AuthenticatedRequest,
@@ -341,7 +341,7 @@ router.post(
 
 router.get(
   "/logs",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
@@ -416,7 +416,7 @@ router.get(
 
 router.get(
   "/logs/:id",
-  requireRoles([Role.ADMIN]),
+  requireRoles([Role.STAFF, Role.ADMIN]),
   async (
     req: AuthenticatedRequest,
     res: Response,
