@@ -8,6 +8,7 @@ import {
   PaginatedUsersResponse,
   UpdateUserData,
 } from "../types";
+import { sendWelcomeEmail } from "../utils/emailTransporter";
 import { hashAnswer, hashPassword, hashPin } from "../utils/password";
 import { MemberStatus, Prisma, Role, UserStatus } from "@prisma/client";
 
@@ -72,6 +73,10 @@ export const createMember = async (userData: CreateMemberData) => {
           role: true,
           created_at: true,
         },
+      });
+
+      sendWelcomeEmail(user.email, user.full_name).catch((error) => {
+        console.error("Failed to send welcome email:", error);
       });
 
       return user;
